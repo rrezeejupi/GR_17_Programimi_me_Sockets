@@ -17,7 +17,7 @@ class ClientProgram
         string serverIp = args[0];
         int serverPort = int.Parse(args[1]);
         string username = args[2];
-        string role = args[3].ToLower(); 
+        string role = args[3].ToLower();
         bool isAdmin = role == "admin";
 
         await RunClient(serverIp, serverPort, username, role, isAdmin);
@@ -36,7 +36,7 @@ class ClientProgram
 
         while (true)
         {
-             Console.WriteLine("\n--- MENU ---");
+            Console.WriteLine("\n--- MENU ---");
             Console.WriteLine("1. List files");
             Console.WriteLine("2. Read file");
             if (isAdmin) Console.WriteLine("3. Upload file");
@@ -54,9 +54,9 @@ class ClientProgram
             switch (choice)
             {
                 case "1":
-                break;
+                    break;
                 case "2":
-                break;
+                    break;
                 case "3": // Upload-i i fileve
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
 
@@ -77,18 +77,18 @@ class ClientProgram
                         byte[] fileBytes = File.ReadAllBytes(filePath);
                         string b64Content = Convert.ToBase64String(fileBytes);
 
-                        
+
                         Console.WriteLine($"File size: {fileBytes.Length} bytes");
                         Console.WriteLine($"Base64 length: {b64Content.Length} chars");
                         Console.WriteLine($"Filename: '{fileName}'");
 
-                        
+
                         if (b64Content.Contains(' '))
                         {
                             Console.WriteLine("WARNING: Base64 contains spaces - this may break the command");
                         }
 
-                        
+
                         string uploadCommand = $"/upload {fileName} {b64Content}";
                         await writer.WriteLineAsync(uploadCommand);
 
@@ -99,17 +99,22 @@ class ClientProgram
                     {
                         Console.WriteLine("Error: " + ex.Message);
                     }
-                break;  
-                case "4":   
-                break;
+                    break;
+                case "4":
+                    break;
                 case "5":
-                break;
+                    if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
+                    Console.Write("Filename to delete: ");
+                    string fDelete = Console.ReadLine()!;
+                    await writer.WriteLineAsync($"/delete {fDelete}");
+                    Console.WriteLine(await reader.ReadLineAsync());
+                    break;
                 case "6":
-                break;
+                    break;
                 case "7":
-                break;
+                    break;
                 case "8":
-                break;
+                    break;
                 default:
                     Console.WriteLine("Invalid choice.");
                     break;
