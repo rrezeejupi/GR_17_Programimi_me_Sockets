@@ -1,0 +1,15 @@
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\bin\Debug\net8.0\Serveri.exe
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\bin\Debug\net8.0\Serveri.deps.json
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\bin\Debug\net8.0\Serveri.runtimeconfig.json
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\bin\Debug\net8.0\Serveri.dll
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\bin\Debug\net8.0\Serveri.pdb
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\Serveri.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\Serveri.AssemblyInfoInputs.cache
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\Serveri.AssemblyInfo.cs
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\Serveri.csproj.CoreCompileInputs.cache
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\Serveri.sourcelink.json
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\Serveri.dll
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\refint\Serveri.dll
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\Serveri.pdb
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\Serveri.genruntimeconfig.cache
+C:\Users\acer\GR_17_Programimi_me_Sockets\Serveri\obj\Debug\net8.0\ref\Serveri.dll
