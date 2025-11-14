@@ -83,7 +83,26 @@ class Program
     }
 
     static async Task TrafficMonitorLoop(){}
-    static async Task IdleScannerLoop(){}
+    static async Task IdleScannerLoop()
+    {
+        while (true)
+        {
+            var now = DateTime.UtcNow;
+            foreach (var kv in clients)
+            {
+                var s = kv.Value;
+                if (s.IsConnected && (now - s.LastSeen).TotalSeconds > IDLE_TIMEOUT_SECONDS)
+                {
+                    try { s.Tcp.Close(); } catch { }
+                    s.IsConnected = false;
+                    clients.TryRemove(kv.Key, out _);
+                    Console.WriteLine($"[SERVER] Idle closed {s.Username}@{s.IP}");
+                }
+            }
+            await Task.Delay(5000);
+        }
+    }
+
 
     class ClientState
 {
