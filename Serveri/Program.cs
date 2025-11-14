@@ -128,9 +128,11 @@ class Program
       enum Role { Admin, ReadOnly }
 
       class CommandItem
-{
-    
-}
+    {
+        public ClientState Client { get; set; }
+        public string CommandLine { get; set; }
+        public StreamWriter Writer { get; set; }
+    }
 
 }
 
