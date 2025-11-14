@@ -64,7 +64,15 @@ class Program
 
     static async Task HandleClient(ClientState st){}
 
-    static void CloseClient(string id, string reason){}
+    static void CloseClient(string id, string reason)
+    {
+        if (clients.TryRemove(id, out var s))
+        {
+            try { s.Tcp.Close(); } catch { }
+            s.IsConnected = false;
+            Console.WriteLine($"[SERVER] Closed {id}: {reason}");
+        }
+    }
     static async Task CommandProcessorLoop()
     {
     }
