@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Serveri")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+85e56c37f5bb9fd697f8c040e71f49118f3a1fed")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5885be0545efb4cc836f89814e771324800be95b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Serveri")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Serveri")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
