@@ -57,7 +57,22 @@ class ClientProgram
                 break;
                 case "2":
                 break;
-                case "3":
+                case "3": // Upload-i i fileve
+                    if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
+
+                    Console.Write("Filename to upload: ");
+                    string fileName = Console.ReadLine()!.Trim();
+
+                    string currentDir = Directory.GetCurrentDirectory();
+                    string filePath = Path.Combine(currentDir, fileName);
+
+                    if (!File.Exists(filePath))
+                    {
+                        Console.WriteLine($"File not found: {filePath}");
+                        break;
+                    }
+
+                    
                 break;  
                 case "4":   
                 break;
