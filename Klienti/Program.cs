@@ -72,7 +72,33 @@ class ClientProgram
                         break;
                     }
 
-                    
+                    try
+                    {
+                        byte[] fileBytes = File.ReadAllBytes(filePath);
+                        string b64Content = Convert.ToBase64String(fileBytes);
+
+                        
+                        Console.WriteLine($"File size: {fileBytes.Length} bytes");
+                        Console.WriteLine($"Base64 length: {b64Content.Length} chars");
+                        Console.WriteLine($"Filename: '{fileName}'");
+
+                        
+                        if (b64Content.Contains(' '))
+                        {
+                            Console.WriteLine("WARNING: Base64 contains spaces - this may break the command");
+                        }
+
+                        
+                        string uploadCommand = $"/upload {fileName} {b64Content}";
+                        await writer.WriteLineAsync(uploadCommand);
+
+                        string serverResp = await reader.ReadLineAsync();
+                        Console.WriteLine($"Server: {serverResp}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error: " + ex.Message);
+                    }
                 break;  
                 case "4":   
                 break;
