@@ -62,7 +62,52 @@ class Program
         return count;
     }
 
-    static async Task HandleClient(ClientState st){}
+  static async Task HandleClient(ClientState st)
+    {
+        try
+        {
+            var stream = st.Stream;
+            var reader = new StreamReader(stream, Encoding.UTF8);
+            var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
+
+            
+            string hello = await reader.ReadLineAsync();
+            if (hello == null || !hello.StartsWith("HELLO "))
+            {
+                CloseClient(st.Id, "Bad handshake");
+                return;
+            }
+
+            var parts = hello.Split(' ', 3);
+            st.Username = parts[1];
+            st.Role = parts[2].Trim().ToLower() == "admin" ? Role.Admin : Role.ReadOnly;
+            await writer.WriteLineAsync($"WELCOME {st.Username}. Role={st.Role}");
+            Console.WriteLine($"[SERVER] {st.Id} identified as {st.Username} ({st.Role})");
+
+            while (st.IsConnected)
+            {
+                var readTask = reader.ReadLineAsync();
+                var completed = await Task.WhenAny(readTask, Task.Delay(TimeSpan.FromSeconds(IDLE_TIMEOUT_SECONDS)));
+                if (completed != readTask)
+                {
+                    await writer.WriteLineAsync("TIMEOUT:No activity, disconnecting.");
+                    break;
+                }
+
+                string line = readTask.Result;
+                if (line == null) break;
+
+                st.LastSeen = DateTime.UtcNow;
+                st.MessageCount++; 
+                totalBytesReceived += Encoding.UTF8.GetByteCount(line); 
+
+                var cmdItem = new CommandItem { Client = st, CommandLine = line, Writer = writer };
+                commandQueue.Add(cmdItem);
+            }
+        }
+        catch { }
+        finally { CloseClient(st.Id, "Disconnected"); }
+    }
 
     static void CloseClient(string id, string reason)
     {
@@ -90,8 +135,18 @@ class Program
         return sb.ToString();
     }
 
-    static async Task TrafficMonitorLoop(){}
-    static async Task IdleScannerLoop()
+    static async Task TrafficMonitorLoop()
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("[REAL-TIME SERVER STATS]");
+            Console.WriteLine(BuildStatsText());
+            await Task.Delay(5000); // update every 5 seconds
+        }
+    }
+    
+        static async Task IdleScannerLoop()
     {
         while (true)
         {
