@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 class Program
 {
-    static IPAddress SERVER_IP = IPAddress.Any; 
+    static IPAddress SERVER_IP = IPAddress.Any;
     static int SERVER_PORT = 9000;
     static int MAX_ACTIVE_CONNECTIONS = 4;
     static int IDLE_TIMEOUT_SECONDS = 500;
@@ -31,7 +31,7 @@ class Program
 
         _ = Task.Run(CommandProcessorLoop);
         _ = Task.Run(IdleScannerLoop);
-        _ = Task.Run(TrafficMonitorLoop); 
+        _ = Task.Run(TrafficMonitorLoop);
 
         while (true)
         {
@@ -62,7 +62,7 @@ class Program
         return count;
     }
 
-  static async Task HandleClient(ClientState st)
+    static async Task HandleClient(ClientState st)
     {
         try
         {
@@ -70,7 +70,7 @@ class Program
             var reader = new StreamReader(stream, Encoding.UTF8);
             var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
 
-            
+
             string hello = await reader.ReadLineAsync();
             if (hello == null || !hello.StartsWith("HELLO "))
             {
@@ -98,8 +98,8 @@ class Program
                 if (line == null) break;
 
                 st.LastSeen = DateTime.UtcNow;
-                st.MessageCount++; 
-                totalBytesReceived += Encoding.UTF8.GetByteCount(line); 
+                st.MessageCount++;
+                totalBytesReceived += Encoding.UTF8.GetByteCount(line);
 
                 var cmdItem = new CommandItem { Client = st, CommandLine = line, Writer = writer };
                 commandQueue.Add(cmdItem);
@@ -120,8 +120,28 @@ class Program
     }
     static async Task CommandProcessorLoop()
     {
+        foreach (var item in commandQueue.GetConsumingEnumerable())
+        {
+            var st = item.Client;
+            var writer = item.Writer;
+            var cmd = item.CommandLine.Trim();
+
+            try
+            {
+                if (cmd.Equals("/list", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (st.Role != Role.Admin && st.Role != Role.ReadOnly) continue;
+                    var files = Directory.GetFiles(STORAGE_DIR);
+                    await writer.WriteLineAsync(string.Join("|", Array.ConvertAll(files, f => Path.GetFileName(f))));
+                }
+            }
+            catch
+            {
+                await writer.WriteLineAsync("ERR:Exception");
+            }
+        }
     }
-    
+
 
     static string BuildStatsText()
     {
@@ -145,8 +165,8 @@ class Program
             await Task.Delay(5000); // update every 5 seconds
         }
     }
-    
-        static async Task IdleScannerLoop()
+
+    static async Task IdleScannerLoop()
     {
         while (true)
         {
@@ -168,8 +188,8 @@ class Program
 
 
     class ClientState
-{
-    public string Id { get; }
+    {
+        public string Id { get; }
         public TcpClient Tcp { get; }
         public NetworkStream Stream => Tcp.GetStream();
         public string IP { get; }
@@ -180,17 +200,17 @@ class Program
         public int MessageCount { get; set; } = 0;
         public long BytesReceived { get; set; } = 0;
         public long BytesSent { get; set; } = 0;
-     public ClientState(TcpClient tcp)
+        public ClientState(TcpClient tcp)
         {
             Tcp = tcp;
             Id = Guid.NewGuid().ToString().Substring(0, 8);
             IP = tcp.Client.RemoteEndPoint?.ToString() ?? "unknown";
         }
-}
+    }
 
-      enum Role { Admin, ReadOnly }
+    enum Role { Admin, ReadOnly }
 
-      class CommandItem
+    class CommandItem
     {
         public ClientState Client { get; set; }
         public string CommandLine { get; set; }
