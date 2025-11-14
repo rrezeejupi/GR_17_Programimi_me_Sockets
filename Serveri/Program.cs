@@ -134,6 +134,19 @@ class Program
                     var files = Directory.GetFiles(STORAGE_DIR);
                     await writer.WriteLineAsync(string.Join("|", Array.ConvertAll(files, f => Path.GetFileName(f))));
                 }
+                else if (cmd.StartsWith("/read "))
+                {
+                    string fn = cmd.Substring(6).Trim();
+                    var path = Path.Combine(STORAGE_DIR, fn);
+                    if (File.Exists(path))
+                    {
+                        var content = File.ReadAllText(path);
+                        await writer.WriteLineAsync(content);
+                        totalBytesSent += Encoding.UTF8.GetByteCount(content);
+                    }
+                    else
+                        await writer.WriteLineAsync("ERR:File not found");
+                }
             }
             catch
             {
