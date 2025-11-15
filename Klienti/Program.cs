@@ -57,9 +57,15 @@ class ClientProgram
                     await writer.WriteLineAsync("/list");
                     Console.WriteLine(await reader.ReadLineAsync());
                     break;
+
                 case "2":
+                    Console.Write("Filename to read: ");
+                    string fRead = Console.ReadLine()!;
+                    await writer.WriteLineAsync($"/read {fRead}");
+                    Console.WriteLine(await reader.ReadLineAsync());
                     break;
-                case "3": // Upload-i i fileve
+
+                case "3": 
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
 
                     Console.Write("Filename to upload: ");
@@ -102,8 +108,10 @@ class ClientProgram
                         Console.WriteLine("Error: " + ex.Message);
                     }
                     break;
+
                 case "4":
                     break;
+
                 case "5":
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
                     Console.Write("Filename to delete: ");
@@ -111,12 +119,16 @@ class ClientProgram
                     await writer.WriteLineAsync($"/delete {fDelete}");
                     Console.WriteLine(await reader.ReadLineAsync());
                     break;
+
                 case "6":
                     break;
+
                 case "7":
                     break;
+
                 case "8":
                     break;
+                    
                 default:
                     Console.WriteLine("Invalid choice.");
                     break;
