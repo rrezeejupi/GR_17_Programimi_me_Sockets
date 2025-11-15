@@ -133,8 +133,7 @@ class Program
                     if (st.Role != Role.Admin && st.Role != Role.ReadOnly) continue;
                     var files = Directory.GetFiles(STORAGE_DIR);
                     await writer.WriteLineAsync(string.Join("|", Array.ConvertAll(files, f => Path.GetFileName(f))));
-                }
-                else if (cmd.StartsWith("/read "))
+                }else if (cmd.StartsWith("/read "))
                 {
                     string fn = cmd.Substring(6).Trim();
                     var path = Path.Combine(STORAGE_DIR, fn);
@@ -146,8 +145,7 @@ class Program
                     }
                     else
                         await writer.WriteLineAsync("ERR:File not found");
-                }
-                else if (cmd.StartsWith("/upload "))
+                }else if (cmd.StartsWith("/upload "))
                 {
                     var parts = cmd.Split(' ', 3);
                     if (parts.Length < 3)
@@ -174,6 +172,31 @@ class Program
                     {
                         await writer.WriteLineAsync("ERR:Bad base64 payload");
                     }
+                }else if (cmd.StartsWith("/download "))
+                {
+                    string fn = cmd.Substring(10).Trim();
+                    var path = Path.Combine(STORAGE_DIR, fn);
+                    if (File.Exists(path))
+                    {
+                        byte[] bytes = await File.ReadAllBytesAsync(path);
+                        string b64 = Convert.ToBase64String(bytes);
+                        await writer.WriteLineAsync("FILE " + b64);
+                        totalBytesSent += bytes.Length;
+                    }
+                    else await writer.WriteLineAsync("ERR:File not found");
+                }
+                else if (cmd.StartsWith("/delete "))
+                {
+                    if (st.Role != Role.Admin) { await writer.WriteLineAsync("ERR:Permission denied"); continue; }
+
+                    string fn = cmd.Substring(8).Trim();
+                    var path = Path.Combine(STORAGE_DIR, fn);
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                        await writer.WriteLineAsync("OK:Deleted");
+                    }
+                    else await writer.WriteLineAsync("ERR:File not found");
                 }
             }
             catch
