@@ -151,8 +151,10 @@ class ClientProgram
                     Console.WriteLine(await reader.ReadLineAsync());
                     break;
                 case "8":
+                    if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
+                    await writer.WriteLineAsync("/STATS");
+                    Console.WriteLine(await reader.ReadLineAsync());
                     break;
-
                 default:
                     Console.WriteLine("Invalid choice.");
                     break;
