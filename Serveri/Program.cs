@@ -16,7 +16,7 @@ class Program
     static int IDLE_TIMEOUT_SECONDS = 500;
     static string STORAGE_DIR = Path.Combine(AppContext.BaseDirectory, "ServerStorage");
 
-    static TcpListener listener;
+    static TcpListener listener = null!;
     static ConcurrentDictionary<string, ClientState> clients = new();
     static long totalBytesReceived = 0;
     static long totalBytesSent = 0;
@@ -73,7 +73,7 @@ class Program
             var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
 
 
-            string hello = await reader.ReadLineAsync();
+            string? hello = await reader.ReadLineAsync();
             if (hello == null || !hello.StartsWith("HELLO "))
             {
                 CloseClient(st.Id, "Bad handshake");
@@ -96,7 +96,7 @@ class Program
                     break;
                 }
 
-                string line = readTask.Result;
+                string? line = readTask.Result;
                 if (line == null) break;
 
                 st.LastSeen = DateTime.UtcNow;
@@ -128,7 +128,7 @@ class Program
 
         while (true)
         {
-            CommandItem item = null;
+            CommandItem? item = null;
 
             if (adminQueue.TryTake(out item, TimeSpan.FromMilliseconds(20)))
             {
@@ -364,9 +364,9 @@ class Program
 
     class CommandItem
     {
-        public ClientState Client { get; set; }
-        public string CommandLine { get; set; }
-        public StreamWriter Writer { get; set; }
+        public ClientState Client { get; set; } = null!;
+        public string CommandLine { get; set; } = string.Empty;
+        public StreamWriter Writer { get; set; } = null!;
 
     }
 
