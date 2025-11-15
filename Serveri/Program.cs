@@ -20,7 +20,8 @@ class Program
     static ConcurrentDictionary<string, ClientState> clients = new();
     static long totalBytesReceived = 0;
     static long totalBytesSent = 0;
-    static BlockingCollection<CommandItem> commandQueue = new();
+    static BlockingCollection<CommandItem> adminQueue = new();
+    static BlockingCollection<CommandItem> userQueue = new();
 
     static async Task Main()
     {
@@ -102,7 +103,10 @@ class Program
                 totalBytesReceived += Encoding.UTF8.GetByteCount(line);
 
                 var cmdItem = new CommandItem { Client = st, CommandLine = line, Writer = writer };
-                commandQueue.Add(cmdItem);
+                if (st.Role == Role.Admin)
+                    adminQueue.Add(cmdItem);
+                else
+                    userQueue.Add(cmdItem);
             }
         }
         catch { }
@@ -120,97 +124,108 @@ class Program
     }
     static async Task CommandProcessorLoop()
     {
-        foreach (var item in commandQueue.GetConsumingEnumerable())
+
+        while (true)
         {
-            var st = item.Client;
-            var writer = item.Writer;
-            var cmd = item.CommandLine.Trim();
+            CommandItem item = null;
 
-            try
+            if (!adminQueue.TryTake(out item, 0))
             {
-                if (cmd.Equals("/list", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (st.Role != Role.Admin && st.Role != Role.ReadOnly) continue;
-                    var files = Directory.GetFiles(STORAGE_DIR);
-                    await writer.WriteLineAsync(string.Join("|", Array.ConvertAll(files, f => Path.GetFileName(f))));
-                }
-
-                else if (cmd.StartsWith("/read "))
-                {
-                    string fn = cmd.Substring(6).Trim();
-                    var path = Path.Combine(STORAGE_DIR, fn);
-                    if (File.Exists(path))
-                    {
-                        foreach (var line in File.ReadLines(path))
-                        {
-                            await writer.WriteLineAsync(line);
-                        }
-                        await writer.WriteLineAsync("<<EOF>>");
-                    }
-                    else
-                    {
-                        await writer.WriteLineAsync("ERR:File not found");
-                    }
-                }
-
-                else if (cmd.StartsWith("/upload "))
-                {
-                    var parts = cmd.Split(' ', 3);
-                    if (parts.Length < 3)
-                    {
-                        await writer.WriteLineAsync("ERR:Upload format: /upload <filename> <base64>");
-                        continue;
-                    }
-
-                    var fname = parts[1];
-                    var payload = parts[2];
-
-                    try
-                    {
-                        var bytes = Convert.FromBase64String(payload);
-                        var p = Path.Combine(STORAGE_DIR, fname);
-
-                        await File.WriteAllBytesAsync(p, bytes);
-                        await writer.WriteLineAsync("OK:Uploaded");
-
-                        Interlocked.Add(ref totalBytesReceived, bytes.Length);
-                        st.BytesReceived += bytes.Length;
-                    }
-                    catch
-                    {
-                        await writer.WriteLineAsync("ERR:Bad base64 payload");
-                    }
-                }
-                else if (cmd.StartsWith("/download "))
-                {
-                    string fn = cmd.Substring(10).Trim();
-                    var path = Path.Combine(STORAGE_DIR, fn);
-                    if (File.Exists(path))
-                    {
-                        byte[] bytes = await File.ReadAllBytesAsync(path);
-                        string b64 = Convert.ToBase64String(bytes);
-                        await writer.WriteLineAsync("FILE " + b64);
-                        totalBytesSent += bytes.Length;
-                    }
-                    else await writer.WriteLineAsync("ERR:File not found");
-                }
-                else if (cmd.StartsWith("/delete "))
-                {
-                    if (st.Role != Role.Admin) { await writer.WriteLineAsync("ERR:Permission denied"); continue; }
-
-                    string fn = cmd.Substring(8).Trim();
-                    var path = Path.Combine(STORAGE_DIR, fn);
-                    if (File.Exists(path))
-                    {
-                        File.Delete(path);
-                        await writer.WriteLineAsync("OK:Deleted");
-                    }
-                    else await writer.WriteLineAsync("ERR:File not found");
-                }
+                userQueue.TryTake(out item, 100);
             }
-            catch
+
+            if (item != null)
             {
-                await writer.WriteLineAsync("ERR:Exception");
+                var st = item.Client;
+                var writer = item.Writer;
+                var cmd = item.CommandLine.Trim();
+
+                try
+                {
+                    if (cmd.Equals("/list", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (st.Role != Role.Admin && st.Role != Role.ReadOnly) continue;
+                        var files = Directory.GetFiles(STORAGE_DIR);
+                        await writer.WriteLineAsync(string.Join("|", Array.ConvertAll(files, f => Path.GetFileName(f))));
+                    }
+
+                    else if (cmd.StartsWith("/read "))
+                    {
+                        string fn = cmd.Substring(6).Trim();
+                        var path = Path.Combine(STORAGE_DIR, fn);
+                        if (File.Exists(path))
+                        {
+                            foreach (var line in File.ReadLines(path))
+                            {
+                                await writer.WriteLineAsync(line);
+                            }
+                            await writer.WriteLineAsync("<<EOF>>");
+                        }
+                        else
+                        {
+                            await writer.WriteLineAsync("ERR:File not found");
+                        }
+                    }
+
+                    else if (cmd.StartsWith("/upload "))
+                    {
+                        var parts = cmd.Split(' ', 3);
+                        if (parts.Length < 3)
+                        {
+                            await writer.WriteLineAsync("ERR:Upload format: /upload <filename> <base64>");
+                            continue;
+                        }
+
+                        var fname = parts[1];
+                        var payload = parts[2];
+
+                        try
+                        {
+                            var bytes = Convert.FromBase64String(payload);
+                            var p = Path.Combine(STORAGE_DIR, fname);
+
+                            await File.WriteAllBytesAsync(p, bytes);
+                            await writer.WriteLineAsync("OK:Uploaded");
+
+                            Interlocked.Add(ref totalBytesReceived, bytes.Length);
+                            st.BytesReceived += bytes.Length;
+                        }
+                        catch
+                        {
+                            await writer.WriteLineAsync("ERR:Bad base64 payload");
+                        }
+                    }
+                    else if (cmd.StartsWith("/download "))
+                    {
+                        string fn = cmd.Substring(10).Trim();
+                        var path = Path.Combine(STORAGE_DIR, fn);
+                        if (File.Exists(path))
+                        {
+                            byte[] bytes = await File.ReadAllBytesAsync(path);
+                            string b64 = Convert.ToBase64String(bytes);
+                            await writer.WriteLineAsync("FILE " + b64);
+                            totalBytesSent += bytes.Length;
+                        }
+                        else await writer.WriteLineAsync("ERR:File not found");
+                    }
+                    else if (cmd.StartsWith("/delete "))
+                    {
+                        if (st.Role != Role.Admin) { await writer.WriteLineAsync("ERR:Permission denied"); continue; }
+
+                        string fn = cmd.Substring(8).Trim();
+                        var path = Path.Combine(STORAGE_DIR, fn);
+                        if (File.Exists(path))
+                        {
+                            File.Delete(path);
+                            await writer.WriteLineAsync("OK:Deleted");
+                        }
+                        else await writer.WriteLineAsync("ERR:File not found");
+                    }
+                }
+                catch
+                {
+                    await writer.WriteLineAsync("ERR:Exception");
+                }
             }
         }
     }
@@ -288,6 +303,7 @@ class Program
         public ClientState Client { get; set; }
         public string CommandLine { get; set; }
         public StreamWriter Writer { get; set; }
+
     }
 
 }

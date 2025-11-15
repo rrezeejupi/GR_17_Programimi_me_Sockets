@@ -61,6 +61,10 @@ class ClientProgram
                 case "2":
                     Console.Write("Filename to read: ");
                     string fRead = Console.ReadLine()!;
+
+                    // record start time
+                    var start = DateTime.UtcNow;
+
                     await writer.WriteLineAsync($"/read {fRead}");
 
                     string line;
@@ -68,7 +72,13 @@ class ClientProgram
                     {
                         Console.WriteLine(line);
                     }
+
+                    // record end time
+                    var end = DateTime.UtcNow;
+
+                    Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
+
 
 
                 case "3":
