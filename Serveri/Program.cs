@@ -118,7 +118,7 @@ class Program
             Console.WriteLine($"[SERVER] Closed {id}: {reason}");
         }
     }
-    static async Task CommandProcessorLoop()
+     static async Task CommandProcessorLoop()
     {
         foreach (var item in commandQueue.GetConsumingEnumerable())
         {

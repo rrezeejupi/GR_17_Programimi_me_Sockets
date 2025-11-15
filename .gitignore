@@ -1,0 +1,21 @@
+# Build
+bin/
+obj/
+
+# Build outputs
+*.dll
+*.exe
+*.pdb
+*.cache
+*.json
+*.log
+*.editorconfig
+
+# VS files
+*.user
+*.rsuser
+.vscode/
+.vs/
+
+# OS files
+Thumbs.db

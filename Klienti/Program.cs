@@ -54,6 +54,8 @@ class ClientProgram
             switch (choice)
             {
                 case "1":
+                    await writer.WriteLineAsync("/list");
+                    Console.WriteLine(await reader.ReadLineAsync());
                     break;
                 case "2":
                     break;

@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Latif Resyli\\TCP-SERVER-KLIENT\\GR_17_Programimi_me_Sockets\\Klienti\\Klienti.csproj": {}
+    "C:\\Users\\acer\\GR_17_Programimi_me_Sockets\\Klienti\\Klienti.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Latif Resyli\\TCP-SERVER-KLIENT\\GR_17_Programimi_me_Sockets\\Klienti\\Klienti.csproj": {
+    "C:\\Users\\acer\\GR_17_Programimi_me_Sockets\\Klienti\\Klienti.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Latif Resyli\\TCP-SERVER-KLIENT\\GR_17_Programimi_me_Sockets\\Klienti\\Klienti.csproj",
+        "projectUniqueName": "C:\\Users\\acer\\GR_17_Programimi_me_Sockets\\Klienti\\Klienti.csproj",
         "projectName": "Klienti",
-        "projectPath": "C:\\Users\\Latif Resyli\\TCP-SERVER-KLIENT\\GR_17_Programimi_me_Sockets\\Klienti\\Klienti.csproj",
-        "packagesPath": "C:\\Users\\Latif Resyli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Latif Resyli\\TCP-SERVER-KLIENT\\GR_17_Programimi_me_Sockets\\Klienti\\obj\\",
+        "projectPath": "C:\\Users\\acer\\GR_17_Programimi_me_Sockets\\Klienti\\Klienti.csproj",
+        "packagesPath": "C:\\Users\\acer\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\acer\\GR_17_Programimi_me_Sockets\\Klienti\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Latif Resyli\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\acer\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -32,7 +38,13 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -53,7 +65,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
