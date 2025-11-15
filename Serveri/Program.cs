@@ -129,9 +129,12 @@ class Program
         {
             CommandItem item = null;
 
-            if (!adminQueue.TryTake(out item, 0))
+            if (adminQueue.TryTake(out item, TimeSpan.FromMilliseconds(20)))
             {
-                userQueue.TryTake(out item, 100);
+            }
+            else
+            {
+                userQueue.TryTake(out item, TimeSpan.FromMilliseconds(20));
             }
 
             if (item != null)
