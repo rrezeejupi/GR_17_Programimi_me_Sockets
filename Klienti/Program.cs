@@ -144,8 +144,12 @@ class ClientProgram
                     Console.WriteLine(await reader.ReadLineAsync());
                     break;
                 case "7":
+                    if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
+                    Console.Write("Filename for info: ");
+                    string fInfo = Console.ReadLine()!;
+                    await writer.WriteLineAsync($"/info {fInfo}");
+                    Console.WriteLine(await reader.ReadLineAsync());
                     break;
-
                 case "8":
                     break;
 
