@@ -51,19 +51,20 @@ class ClientProgram
 
             if (choice == "9") break;
 
+            var start = DateTime.UtcNow;
+            var end = DateTime.UtcNow;
+
             switch (choice)
             {
                 case "1":
                     await writer.WriteLineAsync("/list");
                     Console.WriteLine(await reader.ReadLineAsync());
+                    Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
 
                 case "2":
                     Console.Write("Filename to read: ");
                     string fRead = Console.ReadLine()!;
-
-                    // record start time
-                    var start = DateTime.UtcNow;
 
                     await writer.WriteLineAsync($"/read {fRead}");
 
@@ -73,13 +74,8 @@ class ClientProgram
                         Console.WriteLine(line);
                     }
 
-                    // record end time
-                    var end = DateTime.UtcNow;
-
                     Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
-
-
 
                 case "3":
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
@@ -123,6 +119,8 @@ class ClientProgram
                     {
                         Console.WriteLine("Error: " + ex.Message);
                     }
+
+                    Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
 
                 case "4":
@@ -174,6 +172,8 @@ class ClientProgram
                     {
                         Console.WriteLine("ERR: " + ex.Message);
                     }
+
+                    Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
                 case "5":
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
@@ -181,6 +181,7 @@ class ClientProgram
                     string fDelete = Console.ReadLine()!;
                     await writer.WriteLineAsync($"/delete {fDelete}");
                     Console.WriteLine(await reader.ReadLineAsync());
+                    Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
 
                 case "6":
@@ -189,6 +190,7 @@ class ClientProgram
                     string kw = Console.ReadLine()!;
                     await writer.WriteLineAsync($"/search {kw}");
                     Console.WriteLine(await reader.ReadLineAsync());
+                    Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
                 case "7":
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
@@ -196,11 +198,13 @@ class ClientProgram
                     string fInfo = Console.ReadLine()!;
                     await writer.WriteLineAsync($"/info {fInfo}");
                     Console.WriteLine(await reader.ReadLineAsync());
+                    Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
                 case "8":
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
                     await writer.WriteLineAsync("/STATS");
                     Console.WriteLine(await reader.ReadLineAsync());
+                    Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
                 default:
                     Console.WriteLine("Invalid choice.");

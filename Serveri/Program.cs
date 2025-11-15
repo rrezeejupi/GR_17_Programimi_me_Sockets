@@ -290,28 +290,32 @@ class Program
             Console.Clear();
             Console.WriteLine("[REAL-TIME SERVER STATS]");
             Console.WriteLine(BuildStatsText());
-            await Task.Delay(5000); // update every 5 seconds
+            await Task.Delay(5000); 
         }
     }
 
     static async Task IdleScannerLoop()
     {
         while (true)
+    {
+        var now = DateTime.UtcNow;
+
+        foreach (var kv in clients)
         {
-            var now = DateTime.UtcNow;
-            foreach (var kv in clients)
+            var s = kv.Value;
+            if (s.IsConnected && (now - s.LastSeen).TotalSeconds > IDLE_TIMEOUT_SECONDS)
             {
-                var s = kv.Value;
-                if (s.IsConnected && (now - s.LastSeen).TotalSeconds > IDLE_TIMEOUT_SECONDS)
-                {
-                    try { s.Tcp.Close(); } catch { }
-                    s.IsConnected = false;
-                    clients.TryRemove(kv.Key, out _);
-                    Console.WriteLine($"[SERVER] Idle closed {s.Username}@{s.IP}");
-                }
+                Console.WriteLine($"[SERVER] Idle timeout → disconnecting {s.Username}@{s.IP}");
+
+                try { s.Tcp.Close(); } catch { }
+
+                s.IsConnected = false;
+
             }
-            await Task.Delay(5000);
         }
+
+        await Task.Delay(5000);
+    }
     }
 
 
