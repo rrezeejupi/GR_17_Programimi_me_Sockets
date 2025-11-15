@@ -147,6 +147,34 @@ class Program
                     else
                         await writer.WriteLineAsync("ERR:File not found");
                 }
+                else if (cmd.StartsWith("/upload "))
+                {
+                    var parts = cmd.Split(' ', 3);
+                    if (parts.Length < 3)
+                    {
+                        await writer.WriteLineAsync("ERR:Upload format: /upload <filename> <base64>");
+                        continue;
+                    }
+
+                    var fname = parts[1];
+                    var payload = parts[2];
+
+                    try
+                    {
+                        var bytes = Convert.FromBase64String(payload);
+                        var p = Path.Combine(STORAGE_DIR, fname);
+
+                        await File.WriteAllBytesAsync(p, bytes);
+                        await writer.WriteLineAsync("OK:Uploaded");
+
+                        Interlocked.Add(ref totalBytesReceived, bytes.Length);
+                        st.BytesReceived += bytes.Length;
+                    }
+                    catch
+                    {
+                        await writer.WriteLineAsync("ERR:Bad base64 payload");
+                    }
+                }
             }
             catch
             {
