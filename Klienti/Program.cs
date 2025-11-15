@@ -62,10 +62,16 @@ class ClientProgram
                     Console.Write("Filename to read: ");
                     string fRead = Console.ReadLine()!;
                     await writer.WriteLineAsync($"/read {fRead}");
-                    Console.WriteLine(await reader.ReadLineAsync());
+
+                    string line;
+                    while ((line = await reader.ReadLineAsync()) != "<<EOF>>")
+                    {
+                        Console.WriteLine(line);
+                    }
                     break;
 
-                case "3": 
+
+                case "3":
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
 
                     Console.Write("Filename to upload: ");
@@ -128,7 +134,7 @@ class ClientProgram
 
                 case "8":
                     break;
-                    
+
                 default:
                     Console.WriteLine("Invalid choice.");
                     break;

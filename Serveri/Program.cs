@@ -118,7 +118,7 @@ class Program
             Console.WriteLine($"[SERVER] Closed {id}: {reason}");
         }
     }
-     static async Task CommandProcessorLoop()
+    static async Task CommandProcessorLoop()
     {
         foreach (var item in commandQueue.GetConsumingEnumerable())
         {
@@ -133,19 +133,27 @@ class Program
                     if (st.Role != Role.Admin && st.Role != Role.ReadOnly) continue;
                     var files = Directory.GetFiles(STORAGE_DIR);
                     await writer.WriteLineAsync(string.Join("|", Array.ConvertAll(files, f => Path.GetFileName(f))));
-                }else if (cmd.StartsWith("/read "))
+                }
+
+                else if (cmd.StartsWith("/read "))
                 {
                     string fn = cmd.Substring(6).Trim();
                     var path = Path.Combine(STORAGE_DIR, fn);
                     if (File.Exists(path))
                     {
-                        var content = File.ReadAllText(path);
-                        await writer.WriteLineAsync(content);
-                        totalBytesSent += Encoding.UTF8.GetByteCount(content);
+                        foreach (var line in File.ReadLines(path))
+                        {
+                            await writer.WriteLineAsync(line);
+                        }
+                        await writer.WriteLineAsync("<<EOF>>");
                     }
                     else
+                    {
                         await writer.WriteLineAsync("ERR:File not found");
-                }else if (cmd.StartsWith("/upload "))
+                    }
+                }
+
+                else if (cmd.StartsWith("/upload "))
                 {
                     var parts = cmd.Split(' ', 3);
                     if (parts.Length < 3)
@@ -172,7 +180,8 @@ class Program
                     {
                         await writer.WriteLineAsync("ERR:Bad base64 payload");
                     }
-                }else if (cmd.StartsWith("/download "))
+                }
+                else if (cmd.StartsWith("/download "))
                 {
                     string fn = cmd.Substring(10).Trim();
                     var path = Path.Combine(STORAGE_DIR, fn);
