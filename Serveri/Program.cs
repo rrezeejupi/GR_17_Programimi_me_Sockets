@@ -224,6 +224,31 @@ class Program
                         }
                         else await writer.WriteLineAsync("ERR:File not found");
                     }
+                    else if (cmd.StartsWith("/search "))
+                    {
+                        if (st.Role != Role.Admin) { await writer.WriteLineAsync("ERR:Permission denied"); continue; }
+
+                        string kw = cmd.Substring(8).Trim();
+                        var files = Directory.GetFiles(STORAGE_DIR);
+                        var found = new List<string>();
+                        foreach (var f in files)
+                            if (Path.GetFileName(f).Contains(kw, StringComparison.OrdinalIgnoreCase))
+                                found.Add(Path.GetFileName(f));
+                        await writer.WriteLineAsync("SEARCHRESULT:" + string.Join("|", found));
+                    }
+                    else if (cmd.StartsWith("/info "))
+                    {
+                        if (st.Role != Role.Admin) { await writer.WriteLineAsync("ERR:Permission denied"); continue; }
+
+                        string fn = cmd.Substring(6).Trim();
+                        var path = Path.Combine(STORAGE_DIR, fn);
+                        if (File.Exists(path))
+                        {
+                            var fi = new FileInfo(path);
+                            await writer.WriteLineAsync($"INFO:Size={fi.Length};Created={fi.CreationTimeUtc:o};Modified={fi.LastWriteTimeUtc:o}");
+                        }
+                        else await writer.WriteLineAsync("ERR:File not found");
+                    }
                 }
                 catch
                 {
