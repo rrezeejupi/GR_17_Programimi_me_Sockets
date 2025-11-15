@@ -126,8 +126,55 @@ class ClientProgram
                     break;
 
                 case "4":
-                    break;
+                    if (!isAdmin)
+                    {
+                        Console.WriteLine("Permission denied.");
+                        break;
+                    }
 
+                    Console.Write("Filename to download: ");
+                    string downloadName = Console.ReadLine()!.Trim();
+
+                    await writer.WriteLineAsync($"/download {downloadName}");
+
+                    string downloadResp = await reader.ReadLineAsync();
+
+                    if (downloadResp == null)
+                    {
+                        Console.WriteLine("ERR:No response from server");
+                        break;
+                    }
+
+                    if (downloadResp.StartsWith("ERR"))
+                    {
+                        Console.WriteLine(downloadResp);
+                        break;
+                    }
+
+                    var parts = downloadResp.Split(' ', 2);
+                    if (parts.Length < 2 || parts[0] != "FILE")
+                    {
+                        Console.WriteLine("ERR:Bad server response - expected FILE format");
+                        break;
+                    }
+
+                    string b64 = parts[1];
+                    string serverFile = downloadName; 
+
+                    try
+                    {
+                        byte[] fileBytes = Convert.FromBase64String(b64);
+
+                        string savePath = Path.Combine(Directory.GetCurrentDirectory(), serverFile);
+                        File.WriteAllBytes(savePath, fileBytes);
+
+                        Console.WriteLine($"Downloaded and saved as: {savePath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("ERR: " + ex.Message);
+                    }
+                    break;
                 case "5":
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
                     Console.Write("Filename to delete: ");
