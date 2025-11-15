@@ -262,6 +262,15 @@ class Program
                         }
                         else await writer.WriteLineAsync("ERR:File not found");
                     }
+                    else if (cmd.Equals("/STATS", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (st.Role != Role.Admin) { await writer.WriteLineAsync("ERR:Permission denied"); continue; }
+
+                        string statsText = BuildStatsText();
+                        await writer.WriteLineAsync(statsText);
+                        await File.WriteAllTextAsync(Path.Combine(STORAGE_DIR, "server_stats.txt"), statsText);
+                    }
+                    else await writer.WriteLineAsync("ERR:Unknown command");
                 }
                 catch
                 {
@@ -291,32 +300,32 @@ class Program
             Console.Clear();
             Console.WriteLine("[REAL-TIME SERVER STATS]");
             Console.WriteLine(BuildStatsText());
-            await Task.Delay(5000); 
+            await Task.Delay(5000);
         }
     }
 
     static async Task IdleScannerLoop()
     {
         while (true)
-    {
-        var now = DateTime.UtcNow;
-
-        foreach (var kv in clients)
         {
-            var s = kv.Value;
-            if (s.IsConnected && (now - s.LastSeen).TotalSeconds > IDLE_TIMEOUT_SECONDS)
+            var now = DateTime.UtcNow;
+
+            foreach (var kv in clients)
             {
-                Console.WriteLine($"[SERVER] Idle timeout → disconnecting {s.Username}@{s.IP}");
+                var s = kv.Value;
+                if (s.IsConnected && (now - s.LastSeen).TotalSeconds > IDLE_TIMEOUT_SECONDS)
+                {
+                    Console.WriteLine($"[SERVER] Idle timeout → disconnecting {s.Username}@{s.IP}");
 
-                try { s.Tcp.Close(); } catch { }
+                    try { s.Tcp.Close(); } catch { }
 
-                s.IsConnected = false;
+                    s.IsConnected = false;
 
+                }
             }
-        }
 
-        await Task.Delay(5000);
-    }
+            await Task.Delay(5000);
+        }
     }
 
 
