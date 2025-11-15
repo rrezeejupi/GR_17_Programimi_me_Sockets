@@ -174,7 +174,7 @@ class ClientProgram
                     }
 
                     string b64 = parts[1];
-                    string serverFile = downloadName; 
+                    string serverFile = downloadName;
 
                     try
                     {
@@ -219,8 +219,18 @@ class ClientProgram
                     break;
                 case "8":
                     if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
+
                     await writer.WriteLineAsync("/STATS");
-                    Console.WriteLine(await reader.ReadLineAsync());
+
+                    StringBuilder statsBuilder = new StringBuilder();
+                    string statsLine;
+                    while ((statsLine = await reader.ReadLineAsync()) != null && statsLine != "<<ENDSTATS>>")
+                    {
+                        statsBuilder.AppendLine(statsLine);
+                    }
+
+                    Console.WriteLine(statsBuilder.ToString());
+
                     Console.WriteLine($"Response time: {(end - start).TotalMilliseconds} ms");
                     break;
                 default:

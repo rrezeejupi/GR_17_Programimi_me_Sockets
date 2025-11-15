@@ -267,10 +267,20 @@ class Program
                         if (st.Role != Role.Admin) { await writer.WriteLineAsync("ERR:Permission denied"); continue; }
 
                         string statsText = BuildStatsText();
-                        await writer.WriteLineAsync(statsText);
+
+                        using (var stringReader = new StringReader(statsText))
+                        {
+                            string line;
+                            while ((line = stringReader.ReadLine()) != null)
+                            {
+                                await writer.WriteLineAsync(line);
+                            }
+                        }
+
+                        await writer.WriteLineAsync("<<ENDSTATS>>");
+
                         await File.WriteAllTextAsync(Path.Combine(STORAGE_DIR, "server_stats.txt"), statsText);
                     }
-                    else await writer.WriteLineAsync("ERR:Unknown command");
                 }
                 catch
                 {
