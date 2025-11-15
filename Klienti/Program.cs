@@ -137,8 +137,12 @@ class ClientProgram
                     break;
 
                 case "6":
+                    if (!isAdmin) { Console.WriteLine("Permission denied."); break; }
+                    Console.Write("Search keyword: ");
+                    string kw = Console.ReadLine()!;
+                    await writer.WriteLineAsync($"/search {kw}");
+                    Console.WriteLine(await reader.ReadLineAsync());
                     break;
-
                 case "7":
                     break;
 
