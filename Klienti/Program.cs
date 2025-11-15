@@ -31,8 +31,25 @@ class ClientProgram
         using StreamReader reader = new StreamReader(stream, Encoding.UTF8);
         using StreamWriter writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
 
-        await writer.WriteLineAsync($"HELLO {username} {role}");
-        Console.WriteLine(await reader.ReadLineAsync());
+        try
+        {
+            await writer.WriteLineAsync($"HELLO {username} {role}");
+
+            string response = await reader.ReadLineAsync();
+            if (response == null)
+            {
+                Console.WriteLine("Server closed the connection (maybe busy).");
+                return;
+            }
+
+            Console.WriteLine(response);
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine("Could not connect to server: " + ex.Message);
+            return;
+        }
+
 
         while (true)
         {

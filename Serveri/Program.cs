@@ -40,6 +40,7 @@ class Program
 
             if (ActiveConnectionsCount() >= MAX_ACTIVE_CONNECTIONS)
             {
+                Console.WriteLine("[SERVER] REFUSED CONNECTION → Server is busy (max clients reached)");
                 using var s = tcp.GetStream();
                 var msg = Encoding.UTF8.GetBytes("BUSY:Server at capacity. Try later.\n");
                 await s.WriteAsync(msg, 0, msg.Length);
