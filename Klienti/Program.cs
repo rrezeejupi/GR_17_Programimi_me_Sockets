@@ -166,21 +166,21 @@ class ClientProgram
                         break;
                     }
 
-                    var parts = downloadResp.Split(' ', 2);
-                    if (parts.Length < 2 || parts[0] != "FILE")
+                    var parts = downloadResp.Split('\t', 3);
+                    if (parts.Length < 3 || parts[0] != "OK")
                     {
                         Console.WriteLine("ERR:Bad server response - expected FILE format");
                         break;
                     }
 
-                    string b64 = parts[1];
-                    string serverFile = downloadName;
+                    string serverFileName = parts[1];
+                    string b64 = parts[2];
 
                     try
                     {
                         byte[] fileBytes = Convert.FromBase64String(b64);
 
-                        string savePath = Path.Combine(Directory.GetCurrentDirectory(), serverFile);
+                        string savePath = Path.Combine(Directory.GetCurrentDirectory(), serverFileName);
                         File.WriteAllBytes(savePath, fileBytes);
 
                         Console.WriteLine($"Downloaded and saved as: {savePath}");

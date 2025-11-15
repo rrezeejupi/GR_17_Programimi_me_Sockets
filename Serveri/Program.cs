@@ -216,13 +216,22 @@ class Program
                             continue;
                         }
 
-                        byte[] bytes = await File.ReadAllBytesAsync(path);
-                        string b64 = Convert.ToBase64String(bytes);
+                        try
+                        {
+                            byte[] bytes = await File.ReadAllBytesAsync(path);
+                            string b64 = Convert.ToBase64String(bytes);
 
-                        await writer.WriteLineAsync($"OK\t{fn}\t{b64}");
+                            await writer.WriteLineAsync($"OK\t{fn}\t{b64}");
 
-                        Interlocked.Add(ref totalBytesSent, bytes.Length);
-                        st.BytesSent += bytes.Length;
+                            Interlocked.Add(ref totalBytesSent, bytes.Length);
+                            st.BytesSent += bytes.Length;
+
+                        }
+                        catch
+                        {
+                            await writer.WriteLineAsync("ERR:Exception reading file");
+                        }
+
                     }
                     else if (cmd.StartsWith("/delete "))
                     {
@@ -270,7 +279,7 @@ class Program
 
                         using (var stringReader = new StringReader(statsText))
                         {
-                            string line;
+                            string? line = null;
                             while ((line = stringReader.ReadLine()) != null)
                             {
                                 await writer.WriteLineAsync(line);
