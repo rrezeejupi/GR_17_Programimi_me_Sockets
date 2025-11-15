@@ -200,16 +200,28 @@ class Program
                     }
                     else if (cmd.StartsWith("/download "))
                     {
+                        if (st.Role != Role.Admin)
+                        {
+                            await writer.WriteLineAsync("ERR:Permission denied");
+                            continue;
+                        }
+
                         string fn = cmd.Substring(10).Trim();
                         var path = Path.Combine(STORAGE_DIR, fn);
-                        if (File.Exists(path))
+
+                        if (!File.Exists(path))
                         {
-                            byte[] bytes = await File.ReadAllBytesAsync(path);
-                            string b64 = Convert.ToBase64String(bytes);
-                            await writer.WriteLineAsync("FILE " + b64);
-                            totalBytesSent += bytes.Length;
+                            await writer.WriteLineAsync("ERR:File not found");
+                            continue;
                         }
-                        else await writer.WriteLineAsync("ERR:File not found");
+
+                        byte[] bytes = await File.ReadAllBytesAsync(path);
+                        string b64 = Convert.ToBase64String(bytes);
+
+                        await writer.WriteLineAsync($"OK\t{fn}\t{b64}");
+
+                        Interlocked.Add(ref totalBytesSent, bytes.Length);
+                        st.BytesSent += bytes.Length;
                     }
                     else if (cmd.StartsWith("/delete "))
                     {
