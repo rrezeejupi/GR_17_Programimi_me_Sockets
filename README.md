@@ -32,22 +32,22 @@ kanë vetëm read permission.
 ---
 
 ## Struktura e projektit
-/ServerStorage - ruhen files pas upload ose për shfaqjen e stats me gjenerimin e server_stats
-/Serveri/Program.cs - kodi i serverit
-/Klienti/Program.cs - kodi i klientit
+- /ServerStorage - ruhen files pas upload ose për shfaqjen e stats me gjenerimin e server_stats
+- /Serveri/Program.cs - kodi i serverit
+- /Klienti/Program.cs - kodi i klientit
 
 ## Ekzekutimi
-Për të ekzekutuar kodin së pari duhet të hyjmë në direktorumin e serverit:
-cd Serveri
+- Për të ekzekutuar kodin së pari duhet të hyjmë në direktorumin e serverit:
+  - cd Serveri
 
-Bëjmë run Serverin:
-dotnet run
+- Bëjmë run Serverin:
+  - dotnet run
 
-Pastaj hyjmë në direktoriumin e klientit:
-cd Klienti
+- Pastaj hyjmë në direktoriumin e klientit:
+  - cd Klienti
 
-Dhe bëjmë run klientit, me komandën si më poshtë duke marrë parasysh se ip adresa duhet të jetë e pajisjes aktuale, kurse usernamin dhe rolin e caktojmë sipas dëshirës:
-dotnet run -- 127.0.0.1 9000 username admin/user
+- Dhe bëjmë run klientit, me komandën si më poshtë duke marrë parasysh se ip adresa duhet të jetë e pajisjes aktuale, kurse usernamin dhe rolin e caktojmë sipas dëshirës:
+  - dotnet run -- 127.0.0.1 9000 username admin/user
 
 
 
