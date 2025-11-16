@@ -50,4 +50,3 @@ kanë vetëm read permission.
   - dotnet run -- 127.0.0.1 9000 username admin/user
 
 
-
